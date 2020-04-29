@@ -2,7 +2,7 @@ dependencies:
   body-parser: 1.19.0
   cors: 2.8.5
   express: 4.17.1
-  mongodb: 3.5.6
+  mongodb: 3.5.7
   mongoose: 5.9.10
   shortid: 2.2.15
 packages:
@@ -317,6 +317,20 @@ packages:
       saslprep: 1.0.3
     resolution:
       integrity: sha512-sh3q3GLDLT4QmoDLamxtAECwC3RGjq+oNuK1ENV8+tnipIavss6sMYt77hpygqlMOCt0Sla5cl7H4SKCVBCGEg==
+  /mongodb/3.5.7:
+    dependencies:
+      bl: 2.2.0
+      bson: 1.1.4
+      denque: 1.4.1
+      require_optional: 1.0.1
+      safe-buffer: 5.2.0
+    dev: false
+    engines:
+      node: '>=4'
+    optionalDependencies:
+      saslprep: 1.0.3
+    resolution:
+      integrity: sha512-lMtleRT+vIgY/JhhTn1nyGwnSMmJkJELp+4ZbrjctrnBxuLbj6rmLuJFz8W2xUzUqWmqoyVxJLYuC58ZKpcTYQ==
   /mongoose-legacy-pluralize/1.0.2:
     dev: false
     peerDependencies:
@@ -608,6 +622,6 @@ specifiers:
   body-parser: ^1.19.0
   cors: ^2.8.5
   express: ^4.17.1
-  mongodb: ^3.5.5
+  mongodb: ^3.5.7
   mongoose: ^5.9.9
   shortid: ^2.2.15
