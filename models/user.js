@@ -4,7 +4,7 @@ const shortid = require("shortid");
 const mongoose = require("mongoose");
 
 // set user schema & model
-const dataSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     _id: {
       type: String,
       default: shortid.generate
@@ -35,7 +35,7 @@ const dataSchema = new mongoose.Schema({
       }
     ]
   }),
-  Data = mongoose.model("Data", dataSchema);
+  User = mongoose.model("User", userSchema);
 
-// export it so we can access it from elsewhere
-module.exports = mongoose.model("Data", dataSchema);
+// export it so we can access it from other places
+module.exports = mongoose.model("User", userSchema);
