@@ -54,4 +54,3 @@ const listener = app.listen(process.env.PORT || 3000, () => {
 });
 
 // display the date format using tosubtstring / slice?
-// finish models/exercises.js
