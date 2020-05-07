@@ -16,8 +16,9 @@ const userSchema = new mongoose.Schema({
       maxlength: [20, "username too long"],
       trim: true
     },
-    exercise: [
+    exercises: [
       {
+        userId: String,
         description: {
           type: String,
           required: true,
@@ -30,6 +31,7 @@ const userSchema = new mongoose.Schema({
         },
         date: {
           type: Date,
+          required: false,
           default: Date.now
         }
       }

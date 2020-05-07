@@ -1,5 +1,5 @@
 //import user schemas, shortid and Express router
-const User = require("../models/user"),
+const User = require("../models/userModel"),
   router = require("express").Router();
 
 // saving the username in the database
@@ -40,44 +40,75 @@ router.get("/users", (req, res) => {
 
 // adding a new exercise in the db
 router.post("/add", (req, res) => {
-  const { userId, username, description } = req.body,
-    date = new Date(req.body.date).toDateString(),
-    duration = Number(req.body.duration);
+  // Create new instance to push into exercise array in db
+  const { userId, description, duration, date } = req.body;
+  const exercise = {
+    description,
+    duration: Number(duration),
+    date: date ? new Date(date).toDateString() : new Date().toDateString()
+  };
 
   // check if the required fields are filled
   if (!userId || !description || !duration)
-    res.send("Insert userID, description & duration.");
-
-  // Create new instance to push into exercise array in db
-  let newExercise = { username, description, duration, date };
+    res.send("Please insert userID, description & duration.");
 
   // Find user in the db
   User.findByIdAndUpdate(
     userId, // push exercise into array
-    { $push: { exercise: newExercise } },
+    { $push: { exercises: exercise } },
     (err, user) => {
+      // error handling
       if (err) return console.log("Error: ", err);
+
       // return data in the required format
       res.json({
         username: user.username,
-        description: newExercise.description,
-        duration: newExercise.duration,
+        description: exercise.description,
+        duration: exercise.duration,
         _id: user._id,
-        date: newExercise.date
+        date: exercise.date
       });
-    } // error handling
-  ).catch(err => res.status(400).json(`Error: ${err}`));
+    }
+  );
 });
 
 // retrieve & filter the exercise log
 router.get("/log", (req, res, next) => {
   const { userId, limit } = req.query;
-  const from = new Date(req.query.from);
-  const to = new Date(req.query.to);
-  // retrieve exercises log
-  User.find()
-    .then(exercises => res.json(exercises))
-    .catch(err => res.status(400).json(`Error: ${err}`));
+  const from = req.query.from && Date.parse(req.query.from);
+  const to = req.query.to && Date.parse(req.query.to);
+
+  // no userId provided?
+  if (!userId) return res.type("txt").send("Unknown userId");
+
+  User.findById(userId, (err, user) => {
+    // error handling
+    if (err) return err;
+    if (!user) return res.type("txt").send("User not found");
+
+    const log = user.exercises
+      .filter(exercise => {
+        const date = Date.parse(exercise.date);
+
+        if (from && to) {
+          return date >= from && date <= to;
+        } else if (!from && to) {
+          return date <= to;
+        } else if (!to && from) {
+          return date >= from;
+        } else {
+          return true;
+        }
+      })
+      .slice(0, limit || user.exercises.length);
+
+    res.json({
+      _id: user._id,
+      username: user.username,
+      log: log,
+      count: user.exercises.length
+    });
+  });
 });
 
 module.exports = router;

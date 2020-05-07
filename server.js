@@ -8,7 +8,8 @@ const express = require("express"),
 // connect to the database
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false 
 });
 
 // parse the POST bodies
