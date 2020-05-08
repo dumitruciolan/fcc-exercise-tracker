@@ -4,8 +4,8 @@ const User = require("../models/userModel"),
 
 // saving the username in the database
 router.post("/new-user", (req, res, next) => {
+  // create a new user instance
   const { username } = req.body,
-    // create a new user instance
     newUser = new User({ username });
   let data;
 
@@ -30,7 +30,7 @@ router.post("/new-user", (req, res, next) => {
 });
 
 // retrieving all users from the database
-router.get("/users", (req, res) => {
+router.get("/users", (_, res) => {
   User.find()
     .then(users => {
       res.json(users);
@@ -40,8 +40,8 @@ router.get("/users", (req, res) => {
 
 // adding a new exercise in the db
 router.post("/add", (req, res) => {
-  // Create new instance to push into exercise array in db
   const { userId, description, duration, date } = req.body;
+  // Create new instance to push into exercise array in db
   const exercise = {
     description,
     duration: Number(duration),
@@ -73,39 +73,46 @@ router.post("/add", (req, res) => {
 });
 
 // retrieve & filter the exercise log
-router.get("/log", (req, res, next) => {
-  const { userId, limit } = req.query;
-  const from = req.query.from && Date.parse(req.query.from);
-  const to = req.query.to && Date.parse(req.query.to);
+router.get("/log", (req, res) => {
+  const from = req.query.from && new Date(req.query.from),
+    to = req.query.to && new Date(req.query.to),
+    { userId, limit } = req.query;
 
   // no userId provided?
-  if (!userId) return res.type("txt").send("Unknown userId");
+  if (!userId) return res.status(400).send("Unknown userId");
 
   User.findById(userId, (err, user) => {
     // error handling
-    if (err) return err;
-    if (!user) return res.type("txt").send("User not found");
+    if (err) throw err;
+    if (!user) return res.status(404).send("User not found");
 
+    // handle to & from filters
     const log = user.exercises
       .filter(exercise => {
-        const date = Date.parse(exercise.date);
+        const date = new Date(exercise.date);
 
-        if (from && to) {
-          return date >= from && date <= to;
-        } else if (!from && to) {
-          return date <= to;
-        } else if (!to && from) {
-          return date >= from;
-        } else {
-          return true;
+        switch (true) {
+          // both are used
+          case from && to:
+            return date >= from && date <= to;
+          // only to used
+          case !from && to:
+            return date <= to;
+          // only from used
+          case !to && from:
+            return date >= from;
+          // none used
+          default:
+            return true;
         }
-      })
+      }) // limit filter impementation
       .slice(0, limit || user.exercises.length);
 
+    // return the required data
     res.json({
       _id: user._id,
       username: user.username,
-      log: log,
+      log,
       count: user.exercises.length
     });
   });
