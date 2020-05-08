@@ -1,7 +1,7 @@
 "use strict";
 
-const shortid = require("shortid");
-const mongoose = require("mongoose");
+const shortid = require("shortid"),
+  mongoose = require("mongoose");
 
 // set user schema & model
 const userSchema = new mongoose.Schema({
@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     username: {
       type: String,
       required: true,
-      minlength: [3, "username too short"],
+      minlength: [2, "username too short"],
       maxlength: [20, "username too long"],
       trim: true
     },
@@ -22,17 +22,21 @@ const userSchema = new mongoose.Schema({
         description: {
           type: String,
           required: true,
-          maxlength: [20, "description too long"]
+          minlength: [3, "description too short"],
+          maxlength: [20, "description too long"],
+          trim: true
         },
         duration: {
           type: Number,
           required: true,
-          min: [1, "duration too short"]
+          min: [1, "duration too short"],
+          max: [1000, "duration too long"],
+          trim: true
         },
         date: {
           type: Date,
-          required: false,
-          default: Date.now
+          default: Date.now,
+          trim: true
         }
       }
     ]
